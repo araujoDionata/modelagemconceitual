@@ -1,29 +1,28 @@
 package com.dionata.cursomc.resources;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.dionata.cursomc.domain.Category;
+import com.dionata.cursomc.services.CategoryService;
 
 @RestController
 @RequestMapping(value = "/categorias")
 public class CategoryResource {
 
-	@RequestMapping(method = RequestMethod.GET)
-	public List<Category> listar() {
+	@Autowired
+	private CategoryService service;
 
-		Category cat1 = new Category(1, "Informática");
-		Category cat2 = new Category(2, "Escritório");
+	@RequestMapping(value = "/{id}", method = RequestMethod.GET)
+	public ResponseEntity<?> find(@PathVariable Integer id) {
 
-		List<Category> list = new ArrayList<>();
+		Category obj = service.find(id);
+		return ResponseEntity.ok().body(obj);
 
-		list.add(cat1);
-		list.add(cat2);
-		return list;
 	}
 
 }
