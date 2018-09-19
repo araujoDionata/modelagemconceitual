@@ -7,12 +7,17 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.dionata.cursomc.domain.Address;
 import com.dionata.cursomc.domain.Category;
 import com.dionata.cursomc.domain.City;
+import com.dionata.cursomc.domain.Client;
 import com.dionata.cursomc.domain.Product;
 import com.dionata.cursomc.domain.State;
+import com.dionata.cursomc.domain.enums.ClientType;
+import com.dionata.cursomc.repositories.AddressRepository;
 import com.dionata.cursomc.repositories.CategoryRepository;
 import com.dionata.cursomc.repositories.CityRepository;
+import com.dionata.cursomc.repositories.ClientRepository;
 import com.dionata.cursomc.repositories.ProductRepository;
 import com.dionata.cursomc.repositories.StateRepository;
 
@@ -27,6 +32,10 @@ public class CursomcApplication implements CommandLineRunner {
 	private CityRepository cityRepository;
 	@Autowired
 	private StateRepository stateRepository;
+	@Autowired
+	private ClientRepository clientRepository;
+	@Autowired
+	private AddressRepository addressRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(CursomcApplication.class, args);
@@ -63,5 +72,16 @@ public class CursomcApplication implements CommandLineRunner {
 
 		stateRepository.saveAll(Arrays.asList(sta1, sta2));
 		cityRepository.saveAll(Arrays.asList(cit1, cit2, cit3));
+
+		Client cli1 = new Client(null, "Maria Silva", "maria@gmail.com", "12345678900", ClientType.PESSOAFISICA);
+		cli1.getPhones().addAll(Arrays.asList("6232844915", "3484156124"));
+
+		Address a1 = new Address(null, "Edson Luiz", "34-A", "Frente", "Alvorada", "74120030", cli1, cit1);
+		Address a2 = new Address(null, "11", "20", "Apt 201", "Setor Oeste", "38435000", cli1, cit2);
+
+		cli1.getAddresses().addAll(Arrays.asList(a1, a2));
+
+		clientRepository.saveAll(Arrays.asList(cli1));
+		addressRepository.saveAll(Arrays.asList(a1, a2));
 	}
 }
