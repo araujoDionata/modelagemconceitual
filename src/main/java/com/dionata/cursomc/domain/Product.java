@@ -2,7 +2,9 @@ package com.dionata.cursomc.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
@@ -29,6 +32,9 @@ public class Product implements Serializable {
 	@JoinTable(name = "product_category", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "categoria_id"))
 	private List<Category> categories = new ArrayList<>();
 
+	@OneToMany(mappedBy="id.product")
+	private Set<OrderItem> orderItens = new HashSet<>();
+
 	public Product() {
 	}
 
@@ -37,6 +43,14 @@ public class Product implements Serializable {
 		this.id = id;
 		this.name = name;
 		this.price = price;
+	}
+
+	public List<PurchaseOrder> getPurchaseOrders() {
+		List<PurchaseOrder> list = new ArrayList<>();
+		for (OrderItem x : orderItens) {
+			list.add(x.getPurchaseOrder());
+		}
+		return list;
 	}
 
 	public Integer getId() {
@@ -69,6 +83,14 @@ public class Product implements Serializable {
 
 	public void setCategories(List<Category> categories) {
 		this.categories = categories;
+	}
+
+	public Set<OrderItem> getOrderItens() {
+		return orderItens;
+	}
+
+	public void setOrderItens(Set<OrderItem> orderItens) {
+		this.orderItens = orderItens;
 	}
 
 	@Override

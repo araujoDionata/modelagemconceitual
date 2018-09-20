@@ -12,6 +12,7 @@ import com.dionata.cursomc.domain.Address;
 import com.dionata.cursomc.domain.Category;
 import com.dionata.cursomc.domain.City;
 import com.dionata.cursomc.domain.Client;
+import com.dionata.cursomc.domain.OrderItem;
 import com.dionata.cursomc.domain.Payment;
 import com.dionata.cursomc.domain.PaymentSlip;
 import com.dionata.cursomc.domain.PaymentWithCard;
@@ -24,6 +25,7 @@ import com.dionata.cursomc.repositories.AddressRepository;
 import com.dionata.cursomc.repositories.CategoryRepository;
 import com.dionata.cursomc.repositories.CityRepository;
 import com.dionata.cursomc.repositories.ClientRepository;
+import com.dionata.cursomc.repositories.OrderItemRepository;
 import com.dionata.cursomc.repositories.PaymentRepository;
 import com.dionata.cursomc.repositories.ProductRepository;
 import com.dionata.cursomc.repositories.PurchaseOrderRepository;
@@ -48,6 +50,8 @@ public class CursomcApplication implements CommandLineRunner {
 	private PaymentRepository paymentRepository;
 	@Autowired
 	private PurchaseOrderRepository purchaseOrderRepository;
+	@Autowired
+	private OrderItemRepository orderItemRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(CursomcApplication.class, args);
@@ -109,6 +113,19 @@ public class CursomcApplication implements CommandLineRunner {
 
 		purchaseOrderRepository.saveAll(Arrays.asList(order1, order2));
 		paymentRepository.saveAll(Arrays.asList(pay1, pay2));
+
+		OrderItem oi1 = new OrderItem(order1, p1, 0.00, 1, 2000.0);
+		OrderItem oi2 = new OrderItem(order1, p3, 0.00, 2, 80.0);
+		OrderItem oi3 = new OrderItem(order2, p2, 100.00, 1, 800.0);
+
+		order1.getOrderItens().addAll(Arrays.asList(oi1, oi2));
+		order2.getOrderItens().addAll(Arrays.asList(oi3));
+
+		p1.getOrderItens().addAll(Arrays.asList(oi1));
+		p3.getOrderItens().addAll(Arrays.asList(oi2));
+		p2.getOrderItens().addAll(Arrays.asList(oi3));
+
+		orderItemRepository.saveAll(Arrays.asList(oi1, oi2, oi3));
 
 	}
 }
