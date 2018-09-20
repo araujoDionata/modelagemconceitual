@@ -1,5 +1,6 @@
 package com.dionata.cursomc;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,14 +12,21 @@ import com.dionata.cursomc.domain.Address;
 import com.dionata.cursomc.domain.Category;
 import com.dionata.cursomc.domain.City;
 import com.dionata.cursomc.domain.Client;
+import com.dionata.cursomc.domain.Payment;
+import com.dionata.cursomc.domain.PaymentSlip;
+import com.dionata.cursomc.domain.PaymentWithCard;
 import com.dionata.cursomc.domain.Product;
+import com.dionata.cursomc.domain.PurchaseOrder;
 import com.dionata.cursomc.domain.State;
 import com.dionata.cursomc.domain.enums.ClientType;
+import com.dionata.cursomc.domain.enums.StatusPayment;
 import com.dionata.cursomc.repositories.AddressRepository;
 import com.dionata.cursomc.repositories.CategoryRepository;
 import com.dionata.cursomc.repositories.CityRepository;
 import com.dionata.cursomc.repositories.ClientRepository;
+import com.dionata.cursomc.repositories.PaymentRepository;
 import com.dionata.cursomc.repositories.ProductRepository;
+import com.dionata.cursomc.repositories.PurchaseOrderRepository;
 import com.dionata.cursomc.repositories.StateRepository;
 
 @SpringBootApplication
@@ -36,6 +44,10 @@ public class CursomcApplication implements CommandLineRunner {
 	private ClientRepository clientRepository;
 	@Autowired
 	private AddressRepository addressRepository;
+	@Autowired
+	private PaymentRepository paymentRepository;
+	@Autowired
+	private PurchaseOrderRepository purchaseOrderRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(CursomcApplication.class, args);
@@ -83,5 +95,20 @@ public class CursomcApplication implements CommandLineRunner {
 
 		clientRepository.saveAll(Arrays.asList(cli1));
 		addressRepository.saveAll(Arrays.asList(a1, a2));
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+		PurchaseOrder order1 = new PurchaseOrder(null, sdf.parse("30/09/2017 10:32"), cli1, a1);
+		PurchaseOrder order2 = new PurchaseOrder(null, sdf.parse("10/10/2017 19:35"), cli1, a2);
+
+		Payment pay1 = new PaymentWithCard(null, StatusPayment.PAID, order1, 6);
+		order1.setPayment(pay1);
+		Payment pay2 = new PaymentSlip(null, StatusPayment.PENDING, order2, sdf.parse("20/10/2017 00:00"), null);
+		order2.setPayment(pay2);
+
+		cli1.getOrders().addAll(Arrays.asList(order1, order2));
+
+		purchaseOrderRepository.saveAll(Arrays.asList(order1, order2));
+		paymentRepository.saveAll(Arrays.asList(pay1, pay2));
+
 	}
 }
