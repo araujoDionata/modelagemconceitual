@@ -1,5 +1,6 @@
 package com.dionata.cursomc.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,10 @@ public class CategoryService {
 		Optional<Category> obj = repo.findById(id);
 		return obj.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto não encontrado! Id: " + id + ", Tipo: " + Category.class.getName()));
+	}
+
+	public List<Category> findAll() {
+		return repo.findAll();
 	}
 
 	public Category insert(Category obj) {
