@@ -25,7 +25,7 @@ public abstract class Payment implements Serializable {
 	@JsonIgnore
 	@OneToOne
 	@MapsId
-	@JoinColumn(name="order_id")
+	@JoinColumn(name = "order_id")
 	private PurchaseOrder order;
 
 	public Payment() {
@@ -34,7 +34,7 @@ public abstract class Payment implements Serializable {
 	public Payment(Integer id, StatusPayment status, PurchaseOrder order) {
 		super();
 		this.id = id;
-		this.status = status.getCod();
+		this.status = (status == null) ? null : status.getCod();
 		this.order = order;
 	}
 
