@@ -3,6 +3,8 @@ package com.dionata.cursomc.services;
 import java.util.List;
 import java.util.Optional;
 
+import javax.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
@@ -10,8 +12,13 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.dionata.cursomc.domain.Address;
+import com.dionata.cursomc.domain.City;
 import com.dionata.cursomc.domain.Client;
+import com.dionata.cursomc.domain.enums.ClientType;
 import com.dionata.cursomc.dto.ClientDTO;
+import com.dionata.cursomc.dto.ClientNewDTO;
+import com.dionata.cursomc.repositories.AddressRepository;
 import com.dionata.cursomc.repositories.ClientRepository;
 import com.dionata.cursomc.services.exceptions.DataIntegrityException;
 import com.dionata.cursomc.services.exceptions.ObjectNotFoundException;
@@ -21,6 +28,8 @@ public class ClientService {
 
 	@Autowired
 	private ClientRepository repo;
+	@Autowired
+	private AddressRepository addressRepository;
 
 	public Client find(Integer id) {
 		Optional<Client> obj = repo.findById(id);
@@ -30,6 +39,14 @@ public class ClientService {
 
 	public List<Client> findAll() {
 		return repo.findAll();
+	}
+
+	@Transactional
+	public Client insert(Client obj) {
+		obj.setId(null);
+		obj = repo.save(obj);
+		addressRepository.saveAll(obj.getAddresses());
+		return obj;
 	}
 
 	public Client update(Client obj) {
@@ -57,6 +74,24 @@ public class ClientService {
 
 	public Client fromDTO(ClientDTO objDto) {
 		return new Client(objDto.getId(), objDto.getName(), objDto.getEmail(), null, null);
+	}
+
+	public Client fromDTO(ClientNewDTO objDto) {
+		Client cli = new Client(null, objDto.getName(), objDto.getEmail(), objDto.getCpfOrCnpj(),
+				ClientType.toEnum(objDto.getClientType()));
+		City city = new City(objDto.getCityId(), null, null);
+		Address address = new Address(null, objDto.getPublicPlace(), objDto.getNumber(), objDto.getComplement(),
+				objDto.getNeighborhood(), objDto.getPostalCode(), cli, city);
+		cli.getAddresses().add(address);
+		cli.getPhones().add(objDto.getPhone1());
+		if (objDto.getPhone2() != null) {
+			cli.getPhones().add(objDto.getPhone2());
+		}
+		if (objDto.getPhone3() != null) {
+			cli.getPhones().add(objDto.getPhone3());
+		}
+
+		return cli;
 	}
 
 	private void updateData(Client newObj, Client obj) {
